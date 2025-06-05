@@ -1,0 +1,126 @@
+-- COMENTÁRIO DE LINHA 
+
+/*
+ comentário em bloco
+*/
+
+
+-- DDL (Data Definition Language
+
+-- CRIANDO UM NOVO BANCO DE DADOS
+
+CREATE DATABASE BD_ZeDaBike
+GO
+
+-- SELECIONA O BANCO DE DADOS
+USE BD_ZeDaBike
+GO
+
+-- CRIANDO A TABELA CLIENTE
+CREATE TABLE Cliente(
+-- NOME DO CAMPO, TIPO, INDICAÇÃO DE CHAVE PRIMARIA,
+-- IDENTITY = AUTO NUMERAÇÃO DO CAMPO
+-- NotNull = campo obrigatório ... Por padrão é Null não é obrigatório. 
+
+	IdCliente	INT PRIMARY KEY IDENTITY,
+	Nome		VARCHAR(100) NOT NULL,
+	Cpf			VARCHAR(14) NOT NULL,
+	Endereco	VARCHAR(100) NULL,
+	Nro			VARCHAR(6) NULL,
+	Complemento VARCHAR(20) NULL,
+	Bairro		VARCHAR(50) NULL,
+	Cidade		VARCHAR(46) NULL,
+	UF			VARCHAR(2) NULL,
+	Cep			VARCHAR(9) NULL,
+	DDD			VARCHAR(2) NOT NULL,
+	Telefone	VARCHAR(10) NOT NULL,
+	Email		VARCHAR(100) NOT NULL
+)
+GO
+
+-- CRIANDO A TABELA CHAMADO
+CREATE TABLE Chamado(
+	IdChamado	 INT PRIMARY KEY IDENTITY,
+	IdCliente	 INT FOREIGN KEY REFERENCES CLIENTE(IdCliente),
+	Endereco	 VARCHAR(100) NOT NULL,
+	Nro			 VARCHAR(6) NOT NULL,
+	Complemento  VARCHAR(20) NULL,
+	Bairro		 VARCHAR(50) NOT NULL,
+	Cidade		 VARCHAR(46) NOT NULL,
+	UF			 VARCHAR(2) NOT NULL,
+	Cep			 VARCHAR(9) NOT NULL,
+	Latitude	 DECIMAL(10,5) NOT NULL,
+	Longitude	 DECIMAL(10,5) NOT NULL,
+	Descricao	 VARCHAR(500) NOT NULL,
+	DataHora	 DATETIME NOT NULL,
+	Situacao	 VARCHAR(2) NOT NULL,
+	MotivoRecusa VARCHAR(200) NOT NULL
+)
+GO
+
+-- CRIANDO A TABELA USUÁRIO
+CREATE TABLE Usuario(
+	IdUsuario	INT PRIMARY KEY IDENTITY,
+	Nome		VARCHAR(100) NOT NULL,
+	Email		VARCHAR(100) NOT NULL,
+	Cpf			VARCHAR(14) NOT NULL,
+	DDD			VARCHAR(2) NOT NULL,
+	Telefone	VARCHAR(10) NOT NULL,
+	Senha		VARCHAR(10) NOT NULL,
+	Bloqueado	BIT NOT NULL,
+	TipoUsuario	VARCHAR(10)
+)
+GO
+
+--CRIANDO A TABELA MECANICO
+CREATE TABLE Mecanico(
+IdMecanico	INT PRIMARY KEY IDENTITY,
+Nome		VARCHAR(100) NOT NULL,
+Email		VARCHAR(100) NOT NULL,
+Cpf			VARCHAR(14) NOT NULL,
+Ddd			VARCHAR(2) NOT NULL,
+Telefone	VARCHAR(10) NOT NULL,
+Senha		VARCHAR(8) NOT NULL,
+Bloqueado	BIT Not NULL,
+IDUsuarioCadastro INT FOREIGN KEY REFERENCES Usuario(IdUsuario),
+IDUsuarioAlteracao INT FOREIGN KEY REFERENCES Usuario(IdUsuario)
+)
+GO
+
+-- CRIANDO A TABELA MECANICO
+CREATE TABLE ChamadoMecanico(
+	IdChamado INT NOT NULL FOREIGN KEY REFERENCES Chamado(IdChamado),
+	IdMecanico INT NOT NULL FOREIGN KEY REFERENCES Mecanico(IdMecanico)
+)
+GO
+
+-- CRIANDO A TABELA FICHA MEDICA
+CREATE TABLE FichaMedica(
+	IdFicaMedica INT PRIMARY KEY IDENTITY,
+	IdMecanico INT NOT NULL FOREIGN KEY REFERENCES Mecanico(IdMecanico) UNIQUE,
+	Peso		DECIMAL(10,2) NOT NULL,
+	Altura		DECIMAL(10,2) NOT NULL,
+	TipoSanguineo	VARCHAR(3) NOT NULL,
+	EhAlergico		BIT NOT NULL
+)
+GO
+
+-- ALTER TABLE 
+-- ALTERANDO TABELAS --> ADICIONAR COLUNA, MUDAR INFORMAÇÃO, ETC..
+-- ADICIONANDO UMA NOVA COLUNA A TABELA 
+ALTER TABLE Cliente
+ADD Sexo VARCHAR(1) NOT NULL
+-- ALTERANDO UMA NOVA COLUNA DA TABELA 
+ALTER TABLE Cliente
+ALTER COLUMN Sexo VARCHAR(1) NULL
+-- EXCLUINDO UMA NOVA COLUNA DA TABELA 
+ALTER TABLE Cliente DROP COLUMN Sexo
+
+-- alterar um nome da tablema
+EXEC sp_RENAME 'Cliente.UF', 'Estado', 'COLUMN'
+EXEC sp_RENAME 'Cliente.Estado', 'Uf', 'COLUMN'
+
+-- GO --> Serve para indicar que os comandos anteriores devem ser enviados e executados no servidor de banco de dados, e a execução de comandos subsequentes será feita em um novo lote de instruções.
+
+--DROP DATABASE (APAGA TODO BD)
+-- DROP TABLE FichaMedica 
