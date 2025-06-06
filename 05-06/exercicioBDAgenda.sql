@@ -547,6 +547,12 @@ where not exists (
   and tptel.tipo = 'Recado'
 );
 
+-- Código teste
+select distinct ctt.nome, tp.tipo
+from contato ctt
+left join telefone tel on ctt.idcontato = tel.idcontato
+left join TipoTelefone tp on tel.tipotelefone = tp.idtipotelefone
+where tp.tipo != 'Recado';
 
 -- Adicional com quantidade de números de telefone
 select ctt.nome, count(tel.idtelefone) as [Quantidade de telefones]
