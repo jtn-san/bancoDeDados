@@ -426,12 +426,28 @@ from contato as cont
 inner join telefone as tel
     on cont.idcontato = tel.idcontato
 
+	-- versão 2
+
+select distinct
+    cont.nome as Contato,
+    ISNULL(tel.numero, 'Sem Contato') as Número
+from contato as cont
+left join telefone as tel
+    on cont.idcontato = tel.idcontato
+
 -- 12. Liste os contatos que possuem telefone do tipo 'Recado', mostrando o nome, o tipo do 
 -- telefone e o número.
 select ctt.nome, tel.numero
 from contato ctt
 join telefone tel on ctt.idcontato = tel.idcontato
 where tel.tipotelefone = 3;
+
+-- Correção mostrando o tipo do telefone. 
+select ctt.nome, tp.tipo, tel.numero
+from contato ctt
+join telefone tel on ctt.idcontato = tel.idcontato
+join TipoTelefone tp on tel.tipotelefone = tp.idtipotelefone
+where tp.tipo = 'Recado';
 
 
 -- /* Agregações (GROUP BY, COUNT, MAX, MIN, AVG, SUM)*/
@@ -453,8 +469,8 @@ having count(tel.idtelefone) > 1;
 
 
 -- 15. Quantos telefones do tipo 'Celular' estão cadastrados?
-select count(tel.idtelefone) as Quantidade
-from contato ctt
+select count(tel.idtelefone) as [Quantidade Celular]
+from Contato ctt
 left join telefone tel on ctt.idcontato = tel.idcontato
 group by ctt.nome;
 
@@ -467,25 +483,43 @@ where tipotelefone = 1;
 
 -- 16. Mostre a quantidade total de números que são WhatsApp e quantos não são.
 select
-  sum(case when tel.iswhatsapp = 1 then 1 else 0 end) as [Quantidade de número que são WhatsApp],
-  sum(case when tel.iswhatsapp = 0 then 1 else 0 end) as [Quantidade de número que nãosão WhatsApp]
-from telefone tel;
+  sum(case when iswhatsapp = 1 then 1 else 0 end) as [Quantidade de número que são WhatsApp],
+  sum(case when iswhatsapp = 0 then 1 else 0 end) as [Quantidade de número que não são WhatsApp]
+from telefone;
 
+-- ver2
+
+select case
+  when iswhatsapp = 1 then 'Sim'
+  when iswhatsapp = 0 then 'Não'
+  end as [Tem WhatsApp],
+  count(idContato) as Quantidade
+from telefone
+group by IsWhatsApp
+
+
+select * from telefone
 
 -- 17. Liste o contato que possui o maior número de telefones.
+-- TOP definirá quantos você deseja exibir. 
 select top 1 ctt.nome, count(tel.idtelefone) as [Quantidade de telefones]
 from contato ctt
 join telefone tel on ctt.idcontato = tel.idcontato
 group by ctt.nome
 order by [Quantidade de telefones] desc;
 
+-- Adicional por ordem com mais números
+select ctt.nome, count(tel.idtelefone) as [Quantidade de telefones]
+from contato ctt
+join telefone tel on ctt.idcontato = tel.idcontato
+group by ctt.nome
+order by [Quantidade de telefones] desc;
 
 -- 18. Mostre a data de nascimento mais antiga e a mais recente entre os contatos.
 select 
-  min(ctt.datanascimento) as [Data de NAscimento antiga],
-  max(ctt.datanascimento) as [Data de NAscimento recente]
+  min(ctt.datanascimento) as [Data de Nascimento antiga],
+  max(ctt.datanascimento) as [Data de Nascimento recente]
 from contato ctt;
-
 
 
 -- /* Desafio extra*/
@@ -495,7 +529,12 @@ from contato ctt
 where month(ctt.datanascimento) = month(getdate())  
 -- Compara com o mês atual
   and year(ctt.datanascimento) < year(getdate());  
--- Exclui contatos que ainda não nasceram este ano
+-- Exclui contatos que ainda não nasceram(fizeram) este ano, ou seja, ela não incluirá contatos que ainda não completaram o aniversário no ano em curso.
+
+-- Versão 2
+select * from contato ctt
+where month(ctt.datanascimento) = month(getdate())  
+
 
 -- 20. Liste os contatos que não possuem telefone do tipo 'Recado'	
 select ctt.nome
